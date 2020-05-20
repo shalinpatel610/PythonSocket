@@ -10,19 +10,20 @@ class MyTCPSocketHandler(socketserver.BaseRequestHandler):
     client.
     """
     dict = {}
-    def loadData(self):
+    
+    def load_data(self):
         with open("data.txt") as f:
             lines = f.readlines()
         f.close()
-        for l in lines:
-            l = l.strip('\n')
-            splits = l.split("|")
+        for line in lines:
+            line = line.strip('\n')
+            splits = line.split("|")
             key = splits[0]
             splits.pop(0)
             self.dict[key] = splits
 
     def handle(self):
-        self.loadData()
+        self.load_data()
         while True:
             data = self.request.recv(1024).decode("utf-8").strip()
             if not data:
@@ -32,16 +33,13 @@ class MyTCPSocketHandler(socketserver.BaseRequestHandler):
             option = data[0]
             if option == '1':
                 if data[1].strip() in self.dict:
-                    sendStr = data[1] + '|' + '|'.join(self.dict[data[1]])
-                    self.request.sendall(bytes(sendStr, "utf-8"))
+                    send_str = data[1] + '|' + '|'.join(self.dict[data[1]])
+                    self.request.sendall(bytes(send_str, "utf-8"))
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             if option == '2':
-                l = []
-                l.append(data[2])
-                l.append(data[3])
-                l.append(data[4])
-                self.dict[data[1]] = l
+                input_list = [data[2], data[3], data[4]]
+                self.dict[data[1]] = input_list
                 self.request.sendall(bytes("Customer added successfully", "utf-8"))
             elif option == '3':
                 if data[1].strip() in self.dict:
@@ -51,38 +49,35 @@ class MyTCPSocketHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             elif option == '4':
                 if data[1].strip() in self.dict:
-                    l = self.dict[data[1]]
-                    l[0] = data[2]
-                    self.dict[data[1]] = l
+                    input_list = self.dict[data[1]]
+                    input_list[0] = data[2]
+                    self.dict[data[1]] = input_list
                     self.request.sendall(bytes("Customer age updated successfully", "utf-8"))
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             elif option == '5':
                 if data[1].strip() in self.dict:
-                    l = self.dict[data[1]]
-                    l[1] = data[2]
-                    self.dict[data[1]] = l
+                    input_list = self.dict[data[1]]
+                    input_list[1] = data[2]
+                    self.dict[data[1]] = input_list
                     self.request.sendall(bytes("Customer address updated successfully", "utf-8"))
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             elif option == '6':
                 if data[1].strip() in self.dict:
-                    l = self.dict[data[1]]
-                    l[2] = data[2]
-                    self.dict[data[1]] = l
+                    input_list = self.dict[data[1]]
+                    input_list[2] = data[2]
+                    self.dict[data[1]] = input_list
                     self.request.sendall(bytes("Customer phone number updated successfully", "utf-8"))
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             elif option == '7':
-                l = str(dict(sorted(self.dict.items())))
-                self.request.sendall(bytes(l, "utf-8"))
+                input_list = str(dict(sorted(self.dict.items())))
+                self.request.sendall(bytes(input_list, "utf-8"))
 
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 9998
+    HOST, PORT = "localhost", 9999
 
-    # instantiate the server, and bind to localhost on port 9999
     with socketserver.TCPServer((HOST, PORT), MyTCPSocketHandler) as server:
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
         server.serve_forever()
