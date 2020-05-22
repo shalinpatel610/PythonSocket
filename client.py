@@ -10,10 +10,10 @@ def send_data(value):
     if value == '7':
         print("Received: \n")
         d = eval(received)
-        print("{:<15} {:<5} {:<20} {:<10}".format('Name', 'Age', 'Address', 'Phone Number'))
+        print("{:<20} {:<5} {:<30} {:<10}".format('Name', 'Age', 'Address', 'Phone Number'))
         for key, value in d.items():
             x, y, z = value
-            print("{:<15} {:<5} {:<20} {:<10}".format(key, x, y, z))
+            print("{:<20} {:<5} {:<30} {:<10}".format(key, x, y, z))
     else:
         print("Received: {}".format(received))
 
@@ -33,7 +33,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         print("7. Print report")
         print("8. Exit\n")
         val = input("Select: ")
-        print(val)
 
         if val == '1':
             name = input("Enter name: ")
@@ -102,4 +101,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.close()
             keepOn = False
         else:
-            print("Please enter a number.")
+            continue

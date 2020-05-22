@@ -28,19 +28,23 @@ class MyTCPSocketHandler(socketserver.BaseRequestHandler):
             data = self.request.recv(1024).decode("utf-8").strip()
             if not data:
                 break
-            print(data)
+            print("Client Request : " + data)
             data = data.split("|")
             option = data[0]
             if option == '1':
                 if data[1].strip() in self.dict:
-                    send_str = data[1] + '|' + '|'.join(self.dict[data[1]])
+                    send_list = [i.strip(" ") for i in self.dict[data[1]]]
+                    send_str = data[1] + '|' + '|'.join(send_list)
                     self.request.sendall(bytes(send_str, "utf-8"))
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             if option == '2':
-                input_list = [data[2], data[3], data[4]]
-                self.dict[data[1]] = input_list
-                self.request.sendall(bytes("Customer added successfully", "utf-8"))
+                if data[1] in self.dict:
+                    self.request.sendall(bytes("Customer already exist", "utf-8"))
+                else:
+                    input_list = [data[2], data[3], data[4]]
+                    self.dict[data[1]] = input_list
+                    self.request.sendall(bytes("Customer added successfully", "utf-8"))
             elif option == '3':
                 if data[1].strip() in self.dict:
                     self.dict.pop(data[1])
@@ -72,7 +76,11 @@ class MyTCPSocketHandler(socketserver.BaseRequestHandler):
                 else:
                     self.request.sendall(bytes("Customer not found.", "utf-8"))
             elif option == '7':
-                input_list = str(dict(sorted(self.dict.items())))
+                clean_d = {}
+                for k, v in self.dict.items():
+                    send_list = [i.strip(" ") for i in self.dict[k]]
+                    clean_d[k] = send_list
+                input_list = str(dict(sorted(clean_d.items())))
                 self.request.sendall(bytes(input_list, "utf-8"))
 
 
